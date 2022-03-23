@@ -8,19 +8,35 @@ class App extends React.Component {
   constructor() {
     super();
   }
-  componentDidMount() {
+  
+  async fetchTeams(){
     const apiUrl = 'http://stubber.test.visiblethread.com/teams/allNames';
-    fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Retrieved team data: ", data);
-        this.setState({teams: data, loaded: true});
-      });
+    const response = await fetch(apiUrl);
+    return response.json();
+  }
+
+  async fetchReport(){
+    //Last 12 months
+    const apiUrl = 'http://stubber.test.visiblethread.com/scans/monthly/12';
+    const response = await fetch(apiUrl);
+    // console.log("IN FETCH REPORT", response.json())
+    return response.json();
+  }
+  
+
+  componentDidMount() {
+    this.fetchTeams().then(result => {
+      console.log("teams:", result)
+      this.setState({teams: result, loaded: true});
+    });
+    this.fetchReport().then(result => {
+      console.log("report:", result)
+      // this.setState({teams: this.state.teams, loaded: true});
+    });
   }
 
   render(){
     const dataLoaded = () => {
-      console.log("snkda");
       if (this.state.loaded) { 
         return <Teams teams={this.state.teams}/>; 
       }
