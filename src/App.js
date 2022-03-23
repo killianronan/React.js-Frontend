@@ -1,25 +1,43 @@
-import logo from './logo.svg';
 import './App.css';
+import React, { useEffect, useState } from 'react';
+import Teams from './components/Teams'
+import Loading from './components/Loading';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  state = { teams: [], loaded: false }
+  constructor() {
+    super();
+  }
+  componentDidMount() {
+    const apiUrl = 'http://stubber.test.visiblethread.com/teams/allNames';
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Retrieved team data: ", data);
+        this.setState({teams: data, loaded: true});
+      });
+  }
+
+  render(){
+    const dataLoaded = () => {
+      console.log("snkda");
+      if (this.state.loaded) { 
+        return <Teams teams={this.state.teams}/>; 
+      }
+      return <Loading />;
+    }
+
+    return (
+      <div className="app-container">
+        <div className="header-container">
+          Visible Thread Frontend
+        </div>
+        <div className='team-container'>
+          {dataLoaded()}
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;
