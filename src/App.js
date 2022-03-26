@@ -16,22 +16,15 @@ class App extends React.Component {
   }
 
   async fetchReport(){
-    //Last 12 months
     const apiUrl = 'http://stubber.test.visiblethread.com/scans/monthly/12';
     const response = await fetch(apiUrl);
-    // console.log("IN FETCH REPORT", response.json())
     return response.json();
   }
   
 
   componentDidMount() {
     this.fetchTeams().then(result => {
-      console.log("teams:", result)
       this.setState({teams: result, loaded: true});
-    });
-    this.fetchReport().then(result => {
-      console.log("report:", result)
-      // this.setState({teams: this.state.teams, loaded: true});
     });
   }
 

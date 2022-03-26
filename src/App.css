@@ -17,3 +17,41 @@
   height: 10%;
   background-color: blue;
 }
+
+.list-item{
+  background-color: lightgray; 
+  text-align: center;
+  margin: 10px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+.selected-list-item{
+  background-color: blue; 
+  text-align: center;
+  margin: 10px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+.team-heading{
+  text-align: center;
+}
+.scroll-container{
+  max-height: 400px;
+  min-height: 400px;
+  /* background-color: yellow; */
+  overflow-y: scroll;
+  align-items: center;
+}
+
+.report-container{
+  max-height: 400px;
+  min-height: 400px;
+  overflow-y: scroll;
+  align-items: center;
+  justify-content: center;
+}
+.loading-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

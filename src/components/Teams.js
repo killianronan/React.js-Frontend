@@ -1,71 +1,141 @@
 import React from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
-// import './../Teams.css';
+import Loading from './Loading';
+import './../App.css';
+import TeamsDetail from './TeamsDetail';
 
 let showError = false;
 let monthsShowing = true;
-let months = [1,2,3,4,5,6,7,8,9,10,11,12]
-let weeks = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
-  21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
-  41,42,43,44,45,46,47,48,49,50,51,52]
+let reportGen = false;
+let months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+let weeks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+  21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+  41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52]
 
-const listWeek = weeks.map((week) =><option key={week}>{week}</option>);
-const listMonth = months.map((month) =><option key={month}>{month}</option>);
+const listWeek = weeks.map((week) => <option key={week}>{week}</option>);
+const listMonth = months.map((month) => <option key={month}>{month}</option>);
+let selectedTeam = "";
 
 class Teams extends React.Component {
+  componentDidMount() {
+    this.fetchReport(true, 1).then(result => {
+      reportGen = true;
+      let sum = 0;
+      let isMonth = false;
+      const listReport = result.filter((element) => {
+        if (element["date"] && element["teamName"] == selectedTeam) {
+          if (this.selectInput.current.value == "Months") {
+            sum += element["scansAMonth"];
+            isMonth = true;
+          }
+          else {
+            sum += element["scansAWeek"];
+          }
+          return element
+        }
+      });
+      this.setState({ show: this.state.show, reportData: listReport, average: sum / listReport.length, total: sum, isMonth: isMonth });
+    });
+  }
+
+  async fetchReport(isMonths, amount) {
+    //Last 12 months
+    let urlPostfix = ""
+    if (isMonths)
+      urlPostfix = "monthly/" + amount;
+    else
+      urlPostfix = "weekly/" + amount;
+
+    const apiUrl = 'http://stubber.test.visiblethread.com/scans/' + urlPostfix;
+    const response = await fetch(apiUrl);
+    return response.json();
+  }
+
   showModal = () => {
-    this.setState({ show: true});
+    this.setState({ show: true });
   };
 
   hideModal = () => {
-    this.setState({ show: false});
+    this.setState({ show: false });
     showError = false;
   };
 
   constructor() {
     super();
     this.state = { show: false }
-    this.textInput = React.createRef(); 
-    this.selectInput = React.createRef(); 
+    this.textInput = React.createRef();
+    this.selectInput = React.createRef();
+    this.amountInput = React.createRef();
+  }
+
+  generateReport = () => {
+    if (this.amountInput.current.value) {
+      this.fetchReport(monthsShowing, this.amountInput.current.value).then(result => {
+        let sum = 0;
+        let isMonth = false;
+        const listReport = result.filter((element) => {
+          if (element["date"] && element["teamName"] == selectedTeam) {
+            if (this.selectInput.current.value == "Months") {
+              sum += element["scansAMonth"];
+              isMonth = true;
+            }
+            else {
+              sum += element["scansAWeek"];
+            }
+            return element
+          }
+        });
+        reportGen = true;
+        this.setState({ show: this.state.show, reportData: listReport, average: sum / listReport.length, total: sum, isMonth: isMonth });
+      });
+    }
+  };
+
+  setSelectedTeam(team) {
+    selectedTeam = team;
+    reportGen = false;
+    this.setState({ show: this.state.show });
+    this.generateReport()
   }
 
   getModalFormChanges = () => {
     const isDuplicate = (element) => element == this.textInput.current.value;
-    if(this.props.teams.findIndex(isDuplicate)>-1){
+    if (this.props.teams.findIndex(isDuplicate) > -1) {
       showError = true;
-      this.setState({ show: this.state.show});
+      this.setState({ show: this.state.show });
     }
-    else{
+    else {
       showError = false;
-      this.setState({ show: this.state.show});
+      this.setState({ show: this.state.show });
     }
   };
 
   setSelectedDisplayFormat = () => {
-    if(this.selectInput.current.value=="Weeks"){
+    if (this.selectInput.current.value == "Weeks") {
       monthsShowing = false;
-      this.setState({ show: this.state.show});
+      this.setState({ show: this.state.show });
     }
-    else{
+    else {
       monthsShowing = true;
-      this.setState({ show: this.state.show});
+      this.setState({ show: this.state.show });
     }
   }
 
   submitModal = () => {
-    // Post team
-    if(this.textInput.current.value.length>0 && !showError){
+    if (this.textInput.current.value.length > 0 && !showError) {
       try {
         const requestOptions = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'accept': '*/*' },
           body: JSON.stringify(this.textInput.current.value)
         };
-        
+
         fetch("http://stubber.test.visiblethread.com/teams/add", requestOptions)
           .then((res) => res.json())
           .then((result) => {
             console.log("Post Result: ", result);
+            this.setState({ show: false });
+            alert("Successfully posted new user!")
           });
       } catch (e) {
         console.log("Error logging in: ", e.message);
@@ -74,30 +144,54 @@ class Teams extends React.Component {
   };
 
   render() {
-    const listTeam = this.props.teams.map((teamName) =><li key={teamName}>{teamName}</li>);
-    
-    const ErrorDisplaying = () => {
-      if (!showError) { 
-        return <Form.Text id="teamHelpBlock" muted>
-        No duplicate team names allowed.
-      </Form.Text> ; 
+    if (selectedTeam == "") {
+      selectedTeam = this.props.teams[0];
+    }
+
+    const listTeam = this.props.teams.map((team) => {
+      if (team == selectedTeam) {
+        return <div key={team} className="selected-list-item">
+          <a key={team} onClick={() => this.setSelectedTeam(team)}>{team}</a>
+        </div>
       }
-      return <Form.Text id="teamHelpBlock" style={{color: "red"}}>
-      Duplicate team name entered.
-    </Form.Text> ;
+      return <div key={team} className="list-item">
+        <a key={team} onClick={() => this.setSelectedTeam(team)}>{team}</a>
+      </div>
+    });
+
+    const ErrorDisplaying = () => {
+      if (!showError) {
+        return <Form.Text id="teamHelpBlock" muted>
+          No duplicate team names allowed.
+        </Form.Text>;
+      }
+      return <Form.Text id="teamHelpBlock" style={{ color: "red" }}>
+        Duplicate team name entered.
+      </Form.Text>;
     }
 
     const weeksMonthsDisplaying = () => {
-      if (!monthsShowing) { 
+      if (!monthsShowing) {
         return <><Form.Label htmlFor="timePeriod">Weeks</Form.Label>
-        <Form.Select size="sm" style={{width: "100px"}}>
-          {listWeek}
-        </Form.Select></>;
+          <Form.Select size="sm" style={{ width: "100px" }} ref={this.amountInput}>
+            {listWeek}
+          </Form.Select></>;
       }
       return <><Form.Label htmlFor="timePeriod">Months</Form.Label>
-      <Form.Select size="sm" style={{width: "100px"}}>
-        {listMonth}
-      </Form.Select></>;
+        <Form.Select size="sm" style={{ width: "100px" }} ref={this.amountInput}>
+          {listMonth}
+        </Form.Select></>;
+    }
+
+    const reportGenerated = () => {
+      if (!reportGen) {
+        return <div id="report" className="col-md-10 loading-container">
+          <Loading />
+        </div>;
+      }
+      return <div id="report" className="col-md-10 scroll-container">
+        <TeamsDetail selectedTeam={selectedTeam} reportData={this.state.reportData} average={this.state.average} total={this.state.total} isMonth={this.state.isMonth} />
+      </div>;
     }
 
     return (<>
@@ -110,7 +204,7 @@ class Teams extends React.Component {
           <Form.Control
             id="teamName"
             placeholder="Enter a team name.."
-            ref={this.textInput} 
+            ref={this.textInput}
             onChange={() => this.getModalFormChanges()}
           />
           {ErrorDisplaying()}
@@ -127,11 +221,11 @@ class Teams extends React.Component {
       <div className="container-fluid">
         <div className="row">
           <div className="col-md-6">
-            <Button variant="primary" style={{float:"left", margin: "20px"}} onClick={this.showModal}>Create Team</Button>
+            <Button variant="primary" style={{ float: "left", margin: "20px" }} onClick={this.showModal}>Create Team</Button>
           </div>
           <div className="col-md-2">
-            <Form.Label htmlFor="displayFormat">Display Format</Form.Label>
-            <Form.Select size="sm" style={{width: "100px"}}
+            <Form.Label htmlFor="displayFormat">Format</Form.Label>
+            <Form.Select size="sm" style={{ width: "100px" }}
               onChange={() => this.setSelectedDisplayFormat()} ref={this.selectInput}>
               <option>Months</option>
               <option>Weeks</option>
@@ -141,14 +235,15 @@ class Teams extends React.Component {
             {weeksMonthsDisplaying()}
           </div>
           <div className="col-md-2">
-            <Button variant="secondary" style={{float:"left", margin: "20px"}} onClick={this.showModal}>Generate Report</Button>
+            <Button variant="secondary" style={{ float: "left", margin: "20px" }} onClick={this.generateReport}>Generate Report</Button>
           </div>
         </div>
-        <h1>Teams</h1>
-        <div>
-          <ul>
+        <div className='row'>
+          <h3>Teams</h3>
+          <div id="team" className="col-md-2 scroll-container">
             {listTeam}
-          </ul>
+          </div>
+          {reportGenerated()}
         </div>
       </div>
     </>
