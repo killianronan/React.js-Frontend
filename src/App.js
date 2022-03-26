@@ -1,37 +1,34 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Teams from './components/Teams'
 import Loading from './components/Loading';
 
 class App extends React.Component {
   state = { teams: [], loaded: false }
-  constructor() {
-    super();
-  }
   
-  async fetchTeams(){
+  async fetchTeams() {
     const apiUrl = 'http://stubber.test.visiblethread.com/teams/allNames';
     const response = await fetch(apiUrl);
     return response.json();
   }
 
-  async fetchReport(){
+  async fetchReport() {
     const apiUrl = 'http://stubber.test.visiblethread.com/scans/monthly/12';
     const response = await fetch(apiUrl);
     return response.json();
   }
-  
+
 
   componentDidMount() {
     this.fetchTeams().then(result => {
-      this.setState({teams: result, loaded: true});
+      this.setState({ teams: result, loaded: true });
     });
   }
 
-  render(){
+  render() {
     const dataLoaded = () => {
-      if (this.state.loaded) { 
-        return <Teams teams={this.state.teams}/>; 
+      if (this.state.loaded) {
+        return <Teams teams={this.state.teams} />;
       }
       return <Loading />;
     }

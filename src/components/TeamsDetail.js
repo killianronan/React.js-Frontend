@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Form, Modal, Table } from 'react-bootstrap';
+import { Button, Modal, Table } from 'react-bootstrap';
+import './../styles/TeamsDetail.css'
 
 class TeamDetails extends React.Component {
 
@@ -60,21 +61,19 @@ class TeamDetails extends React.Component {
         return <>{month}</>
     }
 
+    weekOrMonthDisplay(row){
+        if (this.props.isMonth) {
+            return <td className='monthly-scans-cell' onClick={() => this.displayMonthBreakdownPopup(row.date)}>{row.scansAMonth}</td>
+        }
+        return <td>{row.scansAWeek}</td>
+    }
+
 
     render() {
-        const weekOrMonthDisplay = (row) => {
-            if (this.props.isMonth) {
-                return <>
-                    <td style={{ cursor: "pointer" }} onClick={() => this.displayMonthBreakdownPopup(row.date)}>{row.scansAMonth}</td></>
-            }
-            return <>
-                <td>{row.scansAWeek}</td></>
-        }
-
         const listReport = this.props.reportData.map((row, index) =>
             <tr key={index}>
                 <td>{index + 1}</td>
-                {weekOrMonthDisplay(row)}
+                {this.weekOrMonthDisplay(row)}
                 <td colSpan={2}>{this.dateDisplaying(row.date)}</td>
             </tr>
         );
@@ -104,36 +103,32 @@ class TeamDetails extends React.Component {
                     </Button>
                 </Modal.Footer>
             </Modal>
-            <div>
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th>iD</th>
-                            <th>Scans</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {listReport}
-                    </tbody>
-                </Table>
-            </div>
-            <div>
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th>Average Scans</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{this.props.average}</td>
-                            <td>{this.props.total}</td>
-                        </tr>
-                    </tbody>
-                </Table>
-            </div>
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>iD</th>
+                        <th>Scans</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {listReport}
+                </tbody>
+            </Table>
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>Average Scans</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{this.props.average}</td>
+                        <td>{this.props.total}</td>
+                    </tr>
+                </tbody>
+            </Table>
         </>
         );
     }
