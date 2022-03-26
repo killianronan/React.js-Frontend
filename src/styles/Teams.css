@@ -8,7 +8,8 @@
 }
 
 .selected-list-item{
-    background-color: blue; 
+    background-color: darkblue; 
+    color: white;
     text-align: center;
     margin: 10px;
     border-radius: 25px;
@@ -53,4 +54,14 @@
 
 .wm-select-input{
     width: "100px";
+}
+
+.small-screen-input{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.small-screen-select{
+    margin: 10px;
 }

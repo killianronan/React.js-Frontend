@@ -157,7 +157,7 @@ class Teams extends React.Component {
     </Form.Text>;
   }
 
-  weeksMonthsDisplaying(){
+  weeksMonthsNumber(){
     if (!monthsShowing) {
       return <><Form.Label htmlFor="timePeriod">Weeks</Form.Label>
         <Form.Select size="sm" style={{ width: "100px" }} ref={this.amountInput}>
@@ -180,6 +180,54 @@ class Teams extends React.Component {
       <TeamsDetail selectedTeam={selectedTeam} reportData={this.state.reportData} average={this.state.average} total={this.state.total} isMonth={this.state.isMonth} />
     </div>;  
   }
+
+  adjustedScreenSize(){
+    if (window.innerWidth>770) {
+      return <>
+        <div className="row input-container">
+          <div className="col-md-4">
+            <Button variant="primary" style={{ margin: "20px" }} onClick={this.showModal}>Create Team</Button>
+          </div>
+          <div className="col-md-2">
+            <Form.Label htmlFor="displayFormat">Format</Form.Label>
+            <Form.Select size="sm" style={{ width: "100px" }}
+              onChange={() => this.setSelectedDisplayFormat()} ref={this.selectInput}>
+              <option>Months</option>
+              <option>Weeks</option>
+            </Form.Select>
+          </div>
+          <div className="col-md-2">
+            {this.weeksMonthsNumber()}
+          </div>
+          <div className="col-md-4">
+            <Button variant="secondary" style={{ margin: "20px", float:"right" }} onClick={this.generateReport}>Generate Report</Button>
+          </div>
+        </div>
+      </>;
+    }
+    return <div className='input-container'>
+      <div className="small-screen-input">
+        <Button variant="primary" style={{ margin: "10px" }} onClick={this.showModal}>Create Team</Button>
+      </div>
+      <div className="small-screen-input">
+        <div className='small-screen-select'>
+          <Form.Label htmlFor="displayFormat">Format</Form.Label>
+          <Form.Select size="sm" style={{ width: "100px" }}
+            onChange={() => this.setSelectedDisplayFormat()} ref={this.selectInput}>
+            <option>Months</option>
+            <option>Weeks</option>
+          </Form.Select>
+        </div>
+        <div className='small-screen-select'>
+          {this.weeksMonthsNumber()}
+        </div>
+      </div>
+      <div className="small-screen-input">
+        <Button variant="secondary" style={{ margin: "10px"}} onClick={this.generateReport}>Generate Report</Button>
+      </div>
+    </div>;
+  }
+
 
   
   render() {
@@ -221,25 +269,7 @@ class Teams extends React.Component {
         </Modal.Footer>
       </Modal>
       <div className="container-fluid">
-        <div className="row input-container">
-          <div className="col-md-6">
-            <Button variant="primary" style={{ margin: "20px" }} onClick={this.showModal}>Create Team</Button>
-          </div>
-          <div className="col-md-2">
-            <Form.Label htmlFor="displayFormat">Format</Form.Label>
-            <Form.Select size="sm" style={{ width: "100px" }}
-              onChange={() => this.setSelectedDisplayFormat()} ref={this.selectInput}>
-              <option>Months</option>
-              <option>Weeks</option>
-            </Form.Select>
-          </div>
-          <div className="col-md-2">
-            {this.weeksMonthsDisplaying()}
-          </div>
-          <div className="col-md-2">
-            <Button variant="secondary" style={{ margin: "20px" }} onClick={this.generateReport}>Generate Report</Button>
-          </div>
-        </div>
+        {this.adjustedScreenSize()}
         <div className='row'>
           <h3>Teams</h3>
           <div id="team" className="col-md-2 scroll-container">
