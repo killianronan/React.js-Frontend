@@ -271,7 +271,7 @@ class Teams extends React.Component {
       <div className="container-fluid">
         {this.adjustedScreenSize()}
         <div className='row'>
-          <h3>Teams</h3>
+          <h3>{selectedTeam} Report</h3>
           <div id="team" className="col-md-2 scroll-container">
             {listTeam}
           </div>

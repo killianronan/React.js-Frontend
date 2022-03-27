@@ -1,3 +1,9 @@
 .monthly-scans-cell{
     cursor: pointer;
 }
+.col-3{
+    width: 30%;
+}
+.col-2{
+    width: 50%;
+}

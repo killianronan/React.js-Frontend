@@ -74,7 +74,7 @@ class TeamDetails extends React.Component {
             <tr key={index}>
                 <td>{index + 1}</td>
                 {this.weekOrMonthDisplay(row)}
-                <td colSpan={2}>{this.dateDisplaying(row.date)}</td>
+                <td className='col-3'>{this.dateDisplaying(row.date)}</td>
             </tr>
         );
 
@@ -118,8 +118,8 @@ class TeamDetails extends React.Component {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>Average Scans</th>
-                        <th>Total</th>
+                        <th className='col-2'>Average Scans</th>
+                        <th className='col-2'>Total</th>
                     </tr>
                 </thead>
                 <tbody>
